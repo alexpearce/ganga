@@ -401,8 +401,6 @@ class Job(GangaObject):
         # Attempt to spend too long loading un-needed objects into memory in
         # order to read job status
         if name == 'status':
-            if stripProxy(self).getNodeIndexCache():
-                return stripProxy(self).getNodeIndexCache()['display:status']
             return object.__getattribute__(self, 'status')
 
         # FIXME Add some method of checking what objects are known in advance of calling the __getattribute__ method
@@ -636,8 +634,8 @@ class Job(GangaObject):
 
         if self.status != saved_status and self.master is None:
             logger.info('job %s status changed to "%s"', self.getFQID('.'), self.status)
-            if stripProxy(self)._getRegistry() is not None:
-                stripProxy(self)._getRegistry()._dirty(stripProxy(self)._getRoot())
+            self._setDirty()
+            # TODO try to force a flush here maybe?
         if update_master and self.master is not None:
             self.master.updateMasterJobStatus()
 
